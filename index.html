@@ -1,0 +1,1424 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Galben Vasile – Reparații Laptopuri</title>
+<link rel="icon" type="image/svg+xml" href="images/favicon.svg">
+<link rel="icon" type="image/png" sizes="48x48" href="images/favicon-48.png">
+<link rel="apple-touch-icon" href="images/apple-touch-icon.png">
+<meta name="theme-color" content="#070a14">
+<meta name="description" content="Reparația laptopurilor și calculatoarelor: schimbăm ecrane, tastaturi, conectoare, carcase, acumulatoare, plăci de bază. Reinstalarea sistemului de operare. Hîncești și Chișinău.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#070a14;
+  --bg-2:#0c1122;
+  --card:rgba(255,255,255,.04);
+  --card-border:rgba(255,255,255,.09);
+  --text:#e8ecf7;
+  --muted:#9aa3bd;
+  --c1:#22d3ee;   /* cyan */
+  --c2:#6366f1;   /* indigo */
+  --c3:#a855f7;   /* violet */
+  --c4:#f472b6;   /* pink */
+  --grad:linear-gradient(120deg,var(--c1),var(--c2) 45%,var(--c3) 75%,var(--c4));
+  --radius:22px;
+  --ease:cubic-bezier(.22,1,.36,1);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Manrope',system-ui,sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  overflow-x:hidden;
+  line-height:1.6;
+}
+a{color:inherit;text-decoration:none}
+img{max-width:100%;display:block}
+h1,h2,h3,.logo{font-family:'Space Grotesk',sans-serif}
+.container{width:min(1200px,100% - 32px);margin-inline:auto}
+
+/* ---------- Preloader ---------- */
+#preloader{
+  position:fixed;inset:0;z-index:9999;background:var(--bg);
+  display:grid;place-items:center;transition:opacity .8s var(--ease),visibility .8s;
+}
+#preloader.hide{opacity:0;visibility:hidden}
+.loader{position:relative;width:90px;height:90px}
+.loader span{
+  position:absolute;inset:0;border-radius:50%;
+  border:3px solid transparent;border-top-color:var(--c1);
+  animation:spin 1.2s linear infinite;
+}
+.loader span:nth-child(2){inset:12px;border-top-color:var(--c3);animation-duration:1.6s;animation-direction:reverse}
+.loader span:nth-child(3){inset:24px;border-top-color:var(--c4);animation-duration:.9s}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ---------- Background ---------- */
+#particles{position:fixed;inset:0;z-index:-2;pointer-events:none}
+.blobs{position:fixed;inset:0;z-index:-3;overflow:hidden;pointer-events:none}
+.blob{
+  position:absolute;border-radius:50%;filter:blur(90px);opacity:.35;
+  animation:float 22s ease-in-out infinite;
+}
+.blob.b1{width:520px;height:520px;background:var(--c2);top:-120px;left:-120px}
+.blob.b2{width:460px;height:460px;background:var(--c3);bottom:-140px;right:-100px;animation-delay:-7s}
+.blob.b3{width:380px;height:380px;background:var(--c1);top:40%;left:55%;opacity:.2;animation-delay:-14s}
+@keyframes float{
+  0%,100%{transform:translate(0,0) scale(1)}
+  33%{transform:translate(80px,-60px) scale(1.12)}
+  66%{transform:translate(-60px,70px) scale(.92)}
+}
+.grid-bg{
+  position:fixed;inset:0;z-index:-2;pointer-events:none;
+  background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),
+                   linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);
+  background-size:60px 60px;
+  mask-image:radial-gradient(ellipse at center,#000 30%,transparent 75%);
+}
+.cursor-glow{
+  position:fixed;width:420px;height:420px;border-radius:50%;pointer-events:none;z-index:-1;
+  background:radial-gradient(circle,rgba(99,102,241,.18),transparent 65%);
+  transform:translate(-50%,-50%);transition:opacity .3s;
+}
+
+/* ---------- Progress + Header ---------- */
+.progress{position:fixed;top:0;left:0;height:3px;width:0;background:var(--grad);z-index:1000;box-shadow:0 0 12px var(--c2)}
+header{
+  position:fixed;top:0;left:0;right:0;z-index:900;
+  padding:22px 0;transition:all .5s var(--ease);
+}
+header.scrolled{
+  padding:12px 0;background:rgba(7,10,20,.72);
+  backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  border-bottom:1px solid var(--card-border);
+}
+.nav{display:flex;align-items:center;justify-content:space-between;gap:20px}
+.logo{display:flex;align-items:center;gap:12px;font-weight:700;font-size:1.15rem;letter-spacing:.3px}
+.logo-icon{
+  width:42px;height:42px;border-radius:12px;display:grid;place-items:center;
+  background:var(--grad);background-size:200% 200%;animation:gradMove 6s ease infinite;
+  box-shadow:0 8px 24px rgba(99,102,241,.4);
+}
+.logo-icon svg{width:22px;height:22px}
+.nav-links{display:flex;gap:clamp(16px,2.1vw,34px);list-style:none}
+.nav-links a{position:relative;font-weight:500;color:var(--muted);transition:color .3s}
+.nav-links a::after{
+  content:"";position:absolute;left:0;bottom:-6px;height:2px;width:100%;
+  background:var(--grad);transform:scaleX(0);transform-origin:right;transition:transform .45s var(--ease);
+}
+.nav-links a:hover{color:var(--text)}
+.nav-links a:hover::after{transform:scaleX(1);transform-origin:left}
+.btn{
+  position:relative;display:inline-flex;align-items:center;gap:10px;
+  padding:14px 28px;border-radius:50px;font-weight:700;font-size:.95rem;
+  border:none;cursor:pointer;overflow:hidden;isolation:isolate;
+  transition:transform .35s var(--ease),box-shadow .35s var(--ease);
+}
+.btn-primary{background:var(--grad);background-size:200% 200%;color:#fff;animation:gradMove 6s ease infinite;box-shadow:0 10px 30px rgba(99,102,241,.35)}
+.btn-primary::before{
+  content:"";position:absolute;top:0;left:-120%;width:60%;height:100%;z-index:-1;
+  background:linear-gradient(120deg,transparent,rgba(255,255,255,.45),transparent);
+  transform:skewX(-20deg);transition:left .8s var(--ease);
+}
+.btn-primary:hover::before{left:160%}
+.btn:hover{transform:translateY(-3px);box-shadow:0 16px 40px rgba(99,102,241,.5)}
+.btn-ghost{background:var(--card);border:1px solid var(--card-border);color:var(--text);backdrop-filter:blur(10px)}
+.btn-ghost:hover{border-color:rgba(255,255,255,.25)}
+.btn svg{width:18px;height:18px}
+@keyframes gradMove{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+
+.burger{display:none;background:none;border:none;cursor:pointer;width:34px;height:24px;position:relative}
+.burger span{position:absolute;left:0;width:100%;height:2px;background:var(--text);border-radius:2px;transition:.4s var(--ease)}
+.burger span:nth-child(1){top:0}.burger span:nth-child(2){top:11px}.burger span:nth-child(3){top:22px}
+.burger.open span:nth-child(1){top:11px;transform:rotate(45deg)}
+.burger.open span:nth-child(2){opacity:0;transform:translateX(-10px)}
+.burger.open span:nth-child(3){top:11px;transform:rotate(-45deg)}
+
+/* ---------- Hero ---------- */
+.hero{min-height:100vh;display:flex;align-items:center;padding:130px 0 80px;position:relative}
+.hero-grid{display:grid;grid-template-columns:1.05fr 1fr;gap:60px;align-items:center}
+.badge{
+  display:inline-flex;align-items:center;gap:10px;padding:8px 18px;border-radius:50px;
+  background:var(--card);border:1px solid var(--card-border);font-size:.85rem;color:var(--muted);
+  margin-bottom:26px;backdrop-filter:blur(10px);
+}
+.badge .dot{width:8px;height:8px;border-radius:50%;background:#22c55e;box-shadow:0 0 0 0 rgba(34,197,94,.7);animation:pulse 2s infinite}
+@keyframes pulse{70%{box-shadow:0 0 0 12px rgba(34,197,94,0)}100%{box-shadow:0 0 0 0 rgba(34,197,94,0)}}
+.hero h1{font-size:clamp(2.4rem,5.6vw,4.4rem);line-height:1.05;font-weight:700;letter-spacing:-1.5px;margin-bottom:24px}
+.grad-text{
+  background:var(--grad);background-size:250% auto;
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  animation:shine 5s linear infinite;
+}
+@keyframes shine{to{background-position:250% center}}
+.split-word{display:inline-block;overflow:hidden;vertical-align:bottom}
+.split-word > span{display:inline-block;transform:translateY(110%);animation:wordUp 1s var(--ease) forwards}
+@keyframes wordUp{to{transform:translateY(0)}}
+.typed-line{font-size:clamp(1.1rem,2vw,1.4rem);color:var(--muted);margin-bottom:38px;min-height:2em}
+.typed{color:var(--text);font-weight:700}
+.caret{display:inline-block;width:3px;height:1.1em;background:var(--c1);margin-left:4px;vertical-align:-3px;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.hero-actions{display:flex;gap:16px;flex-wrap:wrap}
+.hero-locs{display:flex;gap:26px;margin-top:44px;flex-wrap:wrap;color:var(--muted);font-size:.92rem}
+.hero-locs div{display:flex;align-items:center;gap:8px}
+.hero-locs svg{width:18px;height:18px;color:var(--c1)}
+
+.hero-visual{position:relative;perspective:1200px}
+/* ----- Animated laptop ----- */
+.laptop-scene{
+  position:relative;transform-style:preserve-3d;padding:6% 0 4%;
+  transform:rotateY(-14deg) rotateX(8deg);
+  animation:hover3d 8s ease-in-out infinite;transition:transform .25s ease-out;
+}
+@keyframes hover3d{0%,100%{translate:0 0}50%{translate:0 -16px}}
+.lap{position:relative;transform-style:preserve-3d}
+.lid{
+  position:relative;width:84%;margin:0 auto;aspect-ratio:16/10.4;
+  transform-style:preserve-3d;transform-origin:50% 100%;
+  animation:lidOpen 2s cubic-bezier(.3,1.2,.4,1) 1.3s both;
+}
+@keyframes lidOpen{from{transform:rotateX(-114deg)}to{transform:rotateX(4deg)}}
+.lid-face{position:absolute;inset:0;border-radius:18px 18px 6px 6px;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.lid-front{
+  background:linear-gradient(#161c31,#0b0f1d);border:1px solid rgba(255,255,255,.12);
+  box-shadow:inset 0 0 0 3px #090c17,0 40px 90px -25px rgba(99,102,241,.55);
+}
+.cam{position:absolute;top:1.7%;left:50%;width:6px;height:6px;margin-left:-3px;border-radius:50%;background:#1d2640;box-shadow:0 0 0 2px #0a0d18;transition:background .4s,box-shadow .4s}
+.screen.on ~ .cam,.lid-front.live .cam{background:#22c55e;box-shadow:0 0 0 2px #0a0d18,0 0 8px #22c55e}
+.lid-back{
+  transform:rotateY(180deg);display:grid;place-items:center;
+  background:linear-gradient(135deg,#262e4b,#151a2f 55%,#1d2443);border:1px solid rgba(255,255,255,.12);
+}
+.lid-back svg{width:15%;height:auto;stroke:url(#iconGrad);opacity:.9}
+
+.screen{
+  position:absolute;inset:4.4% 3% 7.5%;border-radius:8px;overflow:hidden;
+  background:radial-gradient(120% 90% at 50% 0%,#0d1430,#04060d 70%);container-type:inline-size;
+}
+.screen::before{ /* scan line */
+  content:"";position:absolute;left:0;right:0;height:30%;top:-30%;z-index:3;pointer-events:none;opacity:0;
+  background:linear-gradient(180deg,transparent,rgba(34,211,238,.12),transparent);
+}
+.screen.ui::before{opacity:1;animation:scan 3.5s ease-in-out infinite}
+@keyframes scan{to{top:110%}}
+.screen::after{ /* glass reflection */
+  content:"";position:absolute;inset:0;z-index:4;pointer-events:none;
+  background:linear-gradient(115deg,rgba(255,255,255,.08),transparent 38%,transparent 70%,rgba(255,255,255,.03));
+}
+.scr-boot,.scr-ui{position:absolute;inset:0;opacity:0;transition:opacity .7s var(--ease)}
+.screen.on .scr-boot{opacity:1}
+.screen.ui .scr-boot{opacity:0}
+.screen.ui .scr-ui{opacity:1}
+.scr-boot{display:grid;place-content:center;justify-items:center;gap:3cqw;font-family:'Space Grotesk';font-weight:700;font-size:4.2cqw}
+.boot-logo{width:15cqw;height:15cqw;border-radius:4cqw;display:grid;place-items:center;background:var(--grad);box-shadow:0 0 6cqw rgba(99,102,241,.6);animation:corePulse 2s ease-in-out infinite}
+.boot-logo svg{width:55%;height:55%}
+.boot-bar{width:34cqw;height:.9cqw;border-radius:1cqw;background:rgba(255,255,255,.08);overflow:hidden}
+.boot-bar i{display:block;height:100%;width:0;background:var(--grad)}
+.screen.on .boot-bar i{animation:bootFill 1.3s var(--ease) forwards}
+@keyframes bootFill{to{width:100%}}
+
+.scr-ui{display:flex;flex-direction:column;padding:3.4cqw 3.8cqw 2.6cqw;gap:2.4cqw;font-size:2.75cqw;line-height:1.25;color:#cfd6ee}
+.scr-top{display:flex;align-items:center;gap:1.3cqw;font-weight:700;font-size:2.9cqw}
+.scr-top i{width:1.6cqw;height:1.6cqw;border-radius:50%;background:#ef4444}
+.scr-top i:nth-child(2){background:#f59e0b}.scr-top i:nth-child(3){background:#22c55e;margin-right:1.4cqw}
+.scr-top b{margin-left:auto;font-family:'Space Grotesk';font-size:2.4cqw;letter-spacing:.4cqw;color:var(--c1);padding:.5cqw 1.6cqw;border:1px solid rgba(34,211,238,.35);border-radius:3cqw}
+.scr-body{flex:1;display:grid;grid-template-columns:34cqw 1fr;gap:5cqw;align-items:center;min-height:0}
+.gauge{position:relative;width:100%;aspect-ratio:1;transition:transform .6s var(--ease)}
+.gauge::before{content:"";position:absolute;inset:-5%;border-radius:50%;border:1px dashed rgba(34,211,238,.35);animation:spin 14s linear infinite}
+.gauge svg{width:100%;height:100%;transform:rotate(-90deg)}
+.gauge circle{fill:none;stroke-width:7}
+.gauge .trk{stroke:rgba(255,255,255,.07)}
+.gauge .val{stroke:url(#gaugeGrad);stroke-linecap:round;stroke-dasharray:283;stroke-dashoffset:283;transition:stroke-dashoffset .6s var(--ease)}
+.gauge-txt{position:absolute;inset:0;display:grid;place-content:center;text-align:center}
+.pct{font-family:'Space Grotesk';font-weight:700;font-size:7.5cqw;line-height:1;transition:color .5s}
+.gauge-txt small{font-size:2.2cqw;color:var(--muted);margin-top:.8cqw}
+.screen.done .gauge{animation:gaugePop .8s var(--ease)}
+.screen.done .pct{color:#34d399}
+.screen.done .gauge svg{filter:drop-shadow(0 0 2.5cqw rgba(52,211,153,.6))}
+@keyframes gaugePop{40%{transform:scale(1.08)}}
+
+.checks{list-style:none;display:grid;gap:1.9cqw}
+.checks li{display:grid;grid-template-columns:1fr auto;align-items:center;gap:.9cqw 2cqw;color:#7f89a8;transition:color .4s}
+.checks .st{width:3.2cqw;height:3.2cqw;border-radius:50%;display:grid;place-items:center;font-size:2.1cqw;font-weight:800;border:.4cqw solid rgba(255,255,255,.12)}
+.checks .bar{grid-column:1/-1;height:.75cqw;border-radius:1cqw;background:rgba(255,255,255,.07);overflow:hidden}
+.checks .bar i{display:block;height:100%;width:0;background:var(--grad);transition:width .85s linear}
+.checks li:not(.run):not(.ok) .bar i{transition:none}
+.checks li.run{color:#e8ecf7}
+.checks li.run .st{border-color:rgba(255,255,255,.12);border-top-color:var(--c1);animation:spin .7s linear infinite}
+.checks li.run .bar i{width:100%}
+.checks li.ok{color:#e8ecf7}
+.checks li.ok .st{border-color:#22c55e;background:#22c55e;color:#03140a}
+.checks li.ok .st::before{content:"✓"}
+.checks li.ok .bar i{width:100%;background:linear-gradient(90deg,#22c55e,#34d399)}
+.scr-foot{display:flex;align-items:center;gap:1.6cqw;font-size:2.5cqw;color:var(--muted);padding-top:2cqw;border-top:1px solid rgba(255,255,255,.07)}
+.scr-foot .led{width:1.5cqw;height:1.5cqw;border-radius:50%;background:var(--c1);box-shadow:0 0 1.5cqw var(--c1);animation:blink 1s steps(1) infinite}
+.screen.done .scr-foot{color:#34d399;font-weight:700}
+.screen.done .scr-foot .led{background:#22c55e;box-shadow:0 0 1.5cqw #22c55e;animation:none}
+
+.base{
+  position:relative;width:100%;aspect-ratio:16/8.6;margin-bottom:-30%;
+  transform-origin:50% 0;transform:rotateX(64deg);
+  display:flex;flex-direction:column;align-items:center;padding:4.5% 6% 0;
+  border-radius:6px 6px 24px 24px;
+  background:linear-gradient(180deg,#1f2745,#121729);
+  border:1px solid rgba(255,255,255,.12);
+  box-shadow:inset 0 2px 0 rgba(255,255,255,.06),0 0 0 1px rgba(0,0,0,.35);
+}
+.kbd{width:100%;display:grid;grid-template-columns:repeat(14,1fr);gap:5px}
+.k{
+  aspect-ratio:1/.8;border-radius:3px;background:#0a0e1b;
+  box-shadow:inset 0 -2px 0 rgba(0,0,0,.45),0 0 0 1px rgba(255,255,255,.03);
+  animation:keyWave 3.6s ease-in-out infinite;animation-delay:var(--d);
+  transition:transform .12s;
+}
+.k.sp{aspect-ratio:auto}
+.k.press{transform:scale(.82);background:#fff!important;box-shadow:0 0 12px #fff!important}
+@keyframes keyWave{
+  0%,100%{background:#0a0e1b;box-shadow:inset 0 -2px 0 rgba(0,0,0,.45)}
+  50%{background:hsl(var(--h) 90% 62% / .55);box-shadow:0 0 10px hsl(var(--h) 90% 62% / .75)}
+}
+.pad{width:28%;aspect-ratio:16/9.5;margin-top:5%;border-radius:6px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.09)}
+.lap-shadow{position:absolute;left:6%;right:6%;bottom:-2%;height:16%;border-radius:50%;background:radial-gradient(closest-side,rgba(0,0,0,.75),transparent);filter:blur(10px);z-index:-1}
+
+.part{
+  position:absolute;z-index:3;padding:10px 12px;border-radius:16px;
+  background:rgba(12,17,34,.78);border:1px solid var(--card-border);backdrop-filter:blur(12px);
+  box-shadow:0 14px 40px rgba(0,0,0,.5);animation:bob 7s ease-in-out infinite;
+}
+.part svg{display:block;width:44px;height:44px}
+.part.p-ram{top:-30px;right:12%;animation-delay:-2s}
+.part.p-ram svg{width:70px;height:30px}
+.part.p-fan{bottom:2%;left:-4%;animation-delay:-4s}
+.part.p-fan .blades{transform-box:fill-box;transform-origin:center;animation:spin 1.1s linear infinite}
+.part.p-ssd{top:38%;left:-56px;animation-delay:-1s}
+
+.glow-ring{
+  position:absolute;inset:8% 12% 30%;border-radius:40px;z-index:-1;
+  background:conic-gradient(from var(--ang,0deg),var(--c1),var(--c2),var(--c3),var(--c4),var(--c1));
+  filter:blur(60px);opacity:.45;animation:rotateAng 6s linear infinite;
+}
+@property --ang{syntax:'<angle>';initial-value:0deg;inherits:false}
+@keyframes rotateAng{to{--ang:360deg}}
+.chip{
+  position:absolute;display:flex;align-items:center;gap:10px;
+  padding:12px 16px;border-radius:16px;font-size:.85rem;font-weight:600;
+  background:rgba(12,17,34,.8);border:1px solid var(--card-border);backdrop-filter:blur(14px);
+  box-shadow:0 14px 40px rgba(0,0,0,.5);animation:bob 6s ease-in-out infinite;
+}
+.chip .ic{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:var(--grad)}
+.chip .ic svg{width:18px;height:18px}
+.chip small{display:block;color:var(--muted);font-weight:500;font-size:.75rem}
+.chip.c-a{top:-26px;left:-30px}
+.chip.c-b{bottom:-30px;right:-20px;animation-delay:-3s}
+.chip.c-c{top:45%;right:-46px;animation-delay:-1.5s}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
+
+.scroll-hint{position:absolute;bottom:30px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:10px;color:var(--muted);font-size:.75rem;letter-spacing:2px;text-transform:uppercase}
+.mouse{width:24px;height:38px;border:2px solid var(--muted);border-radius:14px;position:relative}
+.mouse::after{content:"";position:absolute;left:50%;top:7px;width:4px;height:8px;border-radius:2px;background:var(--c1);transform:translateX(-50%);animation:wheel 1.8s infinite}
+@keyframes wheel{0%{opacity:1;top:7px}100%{opacity:0;top:20px}}
+
+/* ---------- Marquee ---------- */
+.marquee{padding:26px 0;border-block:1px solid var(--card-border);background:rgba(255,255,255,.015);overflow:hidden;position:relative}
+.marquee::before,.marquee::after{content:"";position:absolute;top:0;bottom:0;width:120px;z-index:2}
+.marquee::before{left:0;background:linear-gradient(90deg,var(--bg),transparent)}
+.marquee::after{right:0;background:linear-gradient(-90deg,var(--bg),transparent)}
+.marquee-track{display:flex;gap:56px;width:max-content;animation:marquee 32s linear infinite}
+.marquee-track span{display:flex;align-items:center;gap:56px;font-family:'Space Grotesk';font-size:1.35rem;font-weight:600;color:var(--muted);white-space:nowrap}
+.marquee-track span::after{content:"✦";color:var(--c3)}
+@keyframes marquee{to{transform:translateX(-50%)}}
+
+/* ---------- Sections ---------- */
+section{padding:120px 0;position:relative}
+.sec-head{text-align:center;max-width:680px;margin:0 auto 70px}
+.eyebrow{display:inline-block;font-size:.8rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;margin-bottom:16px}
+.sec-head h2{font-size:clamp(2rem,4vw,3rem);line-height:1.15;letter-spacing:-1px;margin-bottom:18px}
+.sec-head p{color:var(--muted);font-size:1.08rem}
+
+/* Services */
+.services-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:24px}
+.card{
+  position:relative;padding:34px 28px;border-radius:var(--radius);
+  background:var(--card);border:1px solid var(--card-border);
+  overflow:hidden;transform-style:preserve-3d;
+  transition:transform .25s ease-out,border-color .4s,box-shadow .4s;
+  --mx:50%;--my:50%;
+}
+.card::before{
+  content:"";position:absolute;inset:0;opacity:0;transition:opacity .4s;
+  background:radial-gradient(400px circle at var(--mx) var(--my),rgba(99,102,241,.22),transparent 45%);
+}
+.card:hover{border-color:rgba(99,102,241,.45);box-shadow:0 30px 60px -20px rgba(99,102,241,.35)}
+.card:hover::before{opacity:1}
+.card > *{position:relative}
+.card-icon{
+  width:62px;height:62px;border-radius:18px;display:grid;place-items:center;margin-bottom:24px;
+  background:linear-gradient(135deg,rgba(34,211,238,.15),rgba(168,85,247,.15));
+  border:1px solid var(--card-border);transition:transform .6s var(--ease);
+}
+.card:hover .card-icon{transform:translateZ(40px) rotate(-8deg) scale(1.08)}
+.card-icon svg{width:30px;height:30px;stroke:url(#iconGrad)}
+.card h3{font-size:1.3rem;margin-bottom:10px}
+.card p{color:var(--muted);font-size:.96rem}
+.card .num{position:absolute;top:22px;right:26px;font-family:'Space Grotesk';font-size:.85rem;color:rgba(255,255,255,.18);font-weight:700}
+
+/* Why / features */
+.why-grid{display:grid;grid-template-columns:1fr 1fr;gap:70px;align-items:center}
+.why-list{display:grid;gap:18px;margin-top:34px}
+.why-item{display:flex;gap:18px;padding:20px 22px;border-radius:18px;background:var(--card);border:1px solid var(--card-border);transition:transform .4s var(--ease),border-color .4s}
+.why-item:hover{transform:translateX(10px);border-color:rgba(34,211,238,.4)}
+.why-item .ck{flex:none;width:42px;height:42px;border-radius:12px;display:grid;place-items:center;background:var(--grad)}
+.why-item .ck svg{width:20px;height:20px}
+.why-item h4{font-size:1.05rem;margin-bottom:4px}
+.why-item p{color:var(--muted);font-size:.92rem}
+
+.orbit-wrap{position:relative;aspect-ratio:1;max-width:min(480px,calc(100% - 64px));margin-inline:auto;width:100%}
+.orbit{position:absolute;inset:0;border-radius:50%;border:1px dashed rgba(255,255,255,.12);animation:spin 40s linear infinite}
+.orbit.o2{inset:16%;animation-duration:28s;animation-direction:reverse}
+.orbit.o3{inset:32%;border-style:solid;border-color:rgba(99,102,241,.25)}
+.orbit .planet{
+  position:absolute;width:56px;height:56px;border-radius:16px;display:grid;place-items:center;
+  background:rgba(12,17,34,.9);border:1px solid var(--card-border);box-shadow:0 10px 30px rgba(0,0,0,.5);
+}
+.orbit .planet svg{width:26px;height:26px;stroke:url(#iconGrad)}
+.orbit.o1 .planet{animation:spin 40s linear infinite reverse}
+.orbit.o2 .planet{animation:spin 28s linear infinite}
+.p-top{top:-28px;left:calc(50% - 28px)}
+.p-bottom{bottom:-28px;left:calc(50% - 28px)}
+.p-left{left:-28px;top:calc(50% - 28px)}
+.p-right{right:-28px;top:calc(50% - 28px)}
+.orbit-core{
+  position:absolute;inset:38%;border-radius:50%;display:grid;place-items:center;
+  background:var(--grad);background-size:200% 200%;animation:gradMove 5s ease infinite,corePulse 3s ease-in-out infinite;
+}
+.orbit-core svg{width:44%;height:44%}
+@keyframes corePulse{0%,100%{box-shadow:0 0 40px rgba(99,102,241,.5),0 0 0 0 rgba(168,85,247,.4)}50%{box-shadow:0 0 80px rgba(168,85,247,.7),0 0 0 22px rgba(168,85,247,0)}}
+
+/* About / Vasile */
+.about-grid{display:grid;grid-template-columns:.9fr 1.1fr;gap:80px;align-items:center}
+.portrait{position:relative;max-width:440px;margin-inline:auto;width:100%}
+.portrait-frame{
+  position:relative;border-radius:32px;padding:3px;
+  background:conic-gradient(from var(--ang,0deg),var(--c1),var(--c2),var(--c3),var(--c4),var(--c1));
+  animation:rotateAng 6s linear infinite;
+}
+.portrait-frame::before{
+  content:"";position:absolute;inset:0;border-radius:inherit;z-index:-1;
+  background:inherit;filter:blur(36px);opacity:.55;
+}
+.portrait-img{position:relative;border-radius:29px;overflow:hidden;aspect-ratio:4/5;background:var(--bg-2)}
+.portrait-img img{width:100%;height:100%;object-fit:cover;object-position:center 15%;transform:scale(1.08);transition:transform 1.4s var(--ease)}
+.portrait:hover .portrait-img img{transform:scale(1.14)}
+.portrait-img::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 55%,rgba(7,10,20,.85))}
+.portrait-img::before{ /* shine sweep */
+  content:"";position:absolute;inset:0;z-index:2;
+  background:linear-gradient(115deg,transparent 35%,rgba(255,255,255,.22) 50%,transparent 65%);
+  transform:translateX(-100%);animation:sweep 6s ease-in-out infinite;
+}
+@keyframes sweep{0%,60%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
+.portrait-name{position:absolute;left:26px;right:26px;bottom:24px;z-index:3}
+.portrait-name strong{display:block;font-family:'Space Grotesk';font-size:1.6rem;line-height:1.1}
+.portrait-name span{color:#c9cfe4;font-size:.9rem}
+.spin-ring{
+  position:absolute;width:150px;height:150px;top:-50px;right:-50px;z-index:4;
+  animation:spin 18s linear infinite;
+}
+.spin-ring text{font-family:'Space Grotesk';font-size:10.5px;letter-spacing:3.2px;font-weight:600;fill:#e8ecf7;text-transform:uppercase}
+.spin-ring-core{
+  position:absolute;top:-50px;right:-50px;width:150px;height:150px;z-index:4;display:grid;place-items:center;pointer-events:none;
+}
+.spin-ring-core i{width:58px;height:58px;border-radius:50%;display:grid;place-items:center;background:var(--grad);box-shadow:0 10px 30px rgba(99,102,241,.5)}
+.spin-ring-core svg{width:26px;height:26px}
+.about-text h2{font-size:clamp(2rem,4vw,3.1rem);line-height:1.12;letter-spacing:-1px;margin:6px 0 20px}
+.about-text p{color:var(--muted);font-size:1.07rem;margin-bottom:18px}
+.about-sign{font-family:'Space Grotesk';font-size:1.1rem;color:var(--text);margin:28px 0 32px;display:flex;align-items:center;gap:14px}
+.about-sign::before{content:"";width:40px;height:2px;background:var(--grad)}
+.about-tags{display:flex;flex-wrap:wrap;gap:10px;margin-top:6px}
+.about-tags span{padding:8px 16px;border-radius:50px;font-size:.85rem;background:var(--card);border:1px solid var(--card-border);transition:all .4s var(--ease)}
+.about-tags span:hover{border-color:rgba(168,85,247,.5);transform:translateY(-3px)}
+
+/* Videos */
+.video-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:22px}
+.vcard{
+  position:relative;border-radius:24px;overflow:hidden;cursor:pointer;aspect-ratio:4/5;
+  background:var(--bg-2);border:1px solid var(--card-border);isolation:isolate;
+  transition:transform .6s var(--ease),box-shadow .6s var(--ease),border-color .6s;
+}
+.vcard:nth-child(even){margin-top:50px}
+.vcard video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform 1.2s var(--ease),filter .6s}
+.vcard::before{ /* rotating border on hover */
+  content:"";position:absolute;inset:-2px;z-index:-1;border-radius:inherit;opacity:0;transition:opacity .5s;
+  background:conic-gradient(from var(--ang,0deg),var(--c1),var(--c2),var(--c3),var(--c4),var(--c1));
+  animation:rotateAng 4s linear infinite;
+}
+.vcard::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(7,10,20,.25),transparent 35%,transparent 55%,rgba(7,10,20,.92));pointer-events:none}
+.vcard:hover{transform:translateY(-10px);border-color:transparent;box-shadow:0 30px 70px -20px rgba(99,102,241,.55)}
+.vcard:hover::before{opacity:1}
+.vcard:hover video{transform:scale(1.08)}
+.vcard .v-inner{position:absolute;inset:2px;border-radius:22px;overflow:hidden;background:var(--bg-2)}
+.v-num{position:absolute;top:16px;left:16px;z-index:2;font-family:'Space Grotesk';font-weight:700;font-size:.8rem;padding:6px 12px;border-radius:50px;background:rgba(7,10,20,.6);border:1px solid var(--card-border);backdrop-filter:blur(8px)}
+.v-live{position:absolute;top:16px;right:16px;z-index:2;display:flex;align-items:center;gap:6px;font-size:.72rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:6px 10px;border-radius:50px;background:rgba(7,10,20,.6);backdrop-filter:blur(8px)}
+.v-live i{width:7px;height:7px;border-radius:50%;background:#ef4444;animation:pulseRed 1.6s infinite}
+@keyframes pulseRed{0%{box-shadow:0 0 0 0 rgba(239,68,68,.7)}70%{box-shadow:0 0 0 8px rgba(239,68,68,0)}100%{box-shadow:0 0 0 0 rgba(239,68,68,0)}}
+.v-cap{position:absolute;left:18px;right:18px;bottom:22px;z-index:2;transition:transform .6s var(--ease)}
+.v-cap h4{font-size:1.08rem;line-height:1.25;margin-bottom:4px}
+.v-cap span{font-size:.8rem;color:#c9cfe4;display:inline-flex;align-items:center;gap:6px;opacity:0;transform:translateY(8px);transition:all .5s var(--ease)}
+.vcard:hover .v-cap span{opacity:1;transform:none}
+.v-play{
+  position:absolute;top:50%;left:50%;z-index:2;width:68px;height:68px;border-radius:50%;
+  display:grid;place-items:center;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.3);
+  backdrop-filter:blur(10px);transform:translate(-50%,-50%) scale(.6);opacity:0;transition:all .5s var(--ease);
+}
+.v-play::before{content:"";position:absolute;inset:-1px;border-radius:50%;border:2px solid rgba(255,255,255,.5);animation:ripple 2s ease-out infinite}
+.v-play svg{width:24px;height:24px;margin-left:4px}
+.vcard:hover .v-play{opacity:1;transform:translate(-50%,-50%) scale(1)}
+.v-bar{position:absolute;left:0;bottom:0;height:3px;width:0;z-index:3;background:var(--grad)}
+
+.lightbox{
+  position:fixed;inset:0;z-index:2000;display:grid;place-items:center;padding:24px;
+  background:rgba(4,6,14,.82);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  opacity:0;visibility:hidden;transition:opacity .5s var(--ease),visibility .5s;
+}
+.lightbox.open{opacity:1;visibility:visible}
+.lb-stage{position:relative;transform:scale(.85) translateY(30px);transition:transform .7s var(--ease)}
+.lightbox.open .lb-stage{transform:none}
+.lb-stage::before{content:"";position:absolute;inset:-3px;border-radius:24px;z-index:-1;background:conic-gradient(from var(--ang,0deg),var(--c1),var(--c2),var(--c3),var(--c4),var(--c1));animation:rotateAng 5s linear infinite;filter:blur(18px);opacity:.6}
+.lb-stage video{display:block;max-height:86vh;max-width:min(92vw,900px);border-radius:22px;background:#000}
+.lb-btn{
+  position:absolute;width:50px;height:50px;border-radius:50%;display:grid;place-items:center;cursor:pointer;
+  background:rgba(255,255,255,.08);border:1px solid var(--card-border);color:#fff;backdrop-filter:blur(10px);transition:all .35s var(--ease);
+}
+.lb-btn:hover{background:var(--c2);transform:scale(1.1)}
+.lb-btn svg{width:22px;height:22px}
+.lb-close{top:20px;right:20px}
+.lb-prev{left:20px;top:50%;margin-top:-25px}
+.lb-next{right:20px;top:50%;margin-top:-25px}
+.lb-count{position:absolute;bottom:22px;left:50%;transform:translateX(-50%);font-family:'Space Grotesk';color:var(--muted);letter-spacing:2px}
+
+@media (max-width:1000px){
+  .video-grid{grid-template-columns:repeat(4,minmax(240px,1fr));overflow-x:auto;scroll-snap-type:x mandatory;padding:10px 4px 30px;margin-inline:-4px;scrollbar-width:none}
+  .video-grid::-webkit-scrollbar{display:none}
+  .vcard{scroll-snap-align:center}
+  .vcard:nth-child(even){margin-top:0}
+}
+@media (max-width:600px){
+  .video-grid{grid-template-columns:repeat(4,72vw)}
+  .lb-prev,.lb-next{top:auto;bottom:18px;margin:0}
+  .lb-prev{left:calc(50% - 110px)}.lb-next{right:calc(50% - 110px)}
+  .lb-count{bottom:32px}
+  .lb-stage video{max-height:74vh}
+}
+
+/* Process */
+.process{position:relative;display:grid;grid-template-columns:repeat(4,1fr);gap:28px}
+.process-line{position:absolute;top:38px;left:12%;right:12%;height:2px;background:rgba(255,255,255,.08);overflow:hidden}
+.process-line i{display:block;height:100%;width:0;background:var(--grad);transition:width 2s var(--ease)}
+.process.in .process-line i{width:100%}
+.step{text-align:center;position:relative}
+.step-num{
+  width:76px;height:76px;margin:0 auto 22px;border-radius:50%;display:grid;place-items:center;
+  font-family:'Space Grotesk';font-size:1.5rem;font-weight:700;
+  background:var(--bg-2);border:2px solid var(--card-border);position:relative;transition:all .6s var(--ease);
+}
+.process.in .step-num{border-color:transparent;background:linear-gradient(var(--bg-2),var(--bg-2)) padding-box,var(--grad) border-box}
+.step h4{font-size:1.15rem;margin-bottom:8px}
+.step p{color:var(--muted);font-size:.93rem}
+
+/* Sale banner */
+.sale{
+  position:relative;border-radius:32px;padding:70px 60px;overflow:hidden;
+  background:linear-gradient(135deg,rgba(99,102,241,.25),rgba(168,85,247,.18) 50%,rgba(34,211,238,.18));
+  border:1px solid var(--card-border);display:grid;grid-template-columns:1.3fr 1fr;gap:40px;align-items:center;
+}
+.sale::before{
+  content:"";position:absolute;width:500px;height:500px;border-radius:50%;right:-150px;top:-200px;
+  background:radial-gradient(circle,rgba(244,114,182,.35),transparent 65%);animation:float 14s ease-in-out infinite;
+}
+.sale > *{position:relative}
+.sale h2{font-size:clamp(1.8rem,3.6vw,2.7rem);line-height:1.15;margin-bottom:16px}
+.sale p{color:#c9cfe4;margin-bottom:30px;font-size:1.05rem}
+.sale-icons{display:flex;justify-content:center;gap:26px}
+.sale-icons .si{
+  width:120px;height:160px;border-radius:24px;display:grid;place-items:center;
+  background:rgba(7,10,20,.55);border:1px solid var(--card-border);backdrop-filter:blur(10px);
+  animation:bob 5s ease-in-out infinite;
+}
+.sale-icons .si:nth-child(2){width:150px;animation-delay:-2.5s;margin-top:40px}
+.sale-icons svg{width:56px;height:56px;stroke:url(#iconGrad)}
+
+/* Social */
+.socials{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-bottom:24px}
+.soc{
+  position:relative;display:flex;align-items:center;gap:18px;padding:24px 26px;border-radius:var(--radius);
+  background:var(--card);border:1px solid var(--card-border);overflow:hidden;isolation:isolate;
+  transition:transform .5s var(--ease),box-shadow .5s var(--ease),border-color .5s;
+}
+.soc::before{
+  content:"";position:absolute;inset:0;z-index:-1;background:var(--brand);
+  opacity:0;transform:translateY(101%);transition:transform .7s var(--ease),opacity .7s;
+}
+.soc:hover{transform:translateY(-6px);border-color:transparent;box-shadow:0 26px 50px -18px var(--glow)}
+.soc:hover::before{opacity:.22;transform:none}
+.s-ic{
+  flex:none;width:58px;height:58px;border-radius:17px;display:grid;place-items:center;
+  background:var(--brand);box-shadow:0 10px 28px var(--glow);transition:transform .6s var(--ease);
+}
+.soc:hover .s-ic{transform:rotate(-10deg) scale(1.1)}
+.s-ic svg{width:28px;height:28px}
+.soc small{display:block;color:var(--muted);font-size:.8rem;text-transform:uppercase;letter-spacing:1.5px}
+.soc strong{font-family:'Space Grotesk';font-size:1.15rem;overflow-wrap:anywhere}
+.soc .s-arrow{margin-left:auto;flex:none;width:22px;height:22px;color:var(--muted);transition:transform .5s var(--ease),color .5s}
+.soc:hover .s-arrow{transform:translate(4px,-4px);color:#fff}
+.tt{--brand:linear-gradient(135deg,#25f4ee 0%,#111 38%,#111 62%,#fe2c55 100%);--glow:rgba(254,44,85,.4)}
+.tt .s-ic svg{filter:drop-shadow(-1.5px -1px 0 #25f4ee) drop-shadow(1.5px 1px 0 #fe2c55)}
+.fb{--brand:#1877f2;--glow:rgba(24,119,242,.45)}
+.ig{--brand:radial-gradient(circle at 30% 107%,#fdf497 0%,#fdf497 5%,#fd5949 45%,#d6249f 60%,#285aeb 90%);--glow:rgba(214,36,159,.45)}
+.about-social{display:flex;gap:12px;margin:-12px 0 30px}
+.about-social a{
+  position:relative;width:48px;height:48px;border-radius:50%;display:grid;place-items:center;overflow:hidden;isolation:isolate;
+  background:var(--card);border:1px solid var(--card-border);transition:transform .5s var(--ease),box-shadow .5s,border-color .5s;
+}
+.about-social a::before{content:"";position:absolute;inset:0;z-index:-1;background:var(--brand);transform:scale(0);border-radius:50%;transition:transform .5s var(--ease)}
+.about-social a:hover{transform:translateY(-5px);border-color:transparent;box-shadow:0 14px 30px var(--glow)}
+.about-social a:hover::before{transform:scale(1)}
+.about-social svg{width:21px;height:21px}
+
+/* Contact */
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.phones{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:24px}
+.phone-card{
+  display:flex;align-items:center;gap:20px;padding:28px;border-radius:var(--radius);
+  background:var(--card);border:1px solid var(--card-border);transition:all .45s var(--ease);
+}
+.phone-card:hover{transform:translateY(-6px);border-color:rgba(34,211,238,.45);box-shadow:0 24px 50px -20px rgba(34,211,238,.35)}
+.ring{position:relative;flex:none;width:60px;height:60px;border-radius:50%;display:grid;place-items:center;background:var(--grad)}
+.ring::before,.ring::after{content:"";position:absolute;inset:0;border-radius:50%;border:2px solid var(--c1);animation:ripple 2.4s ease-out infinite}
+.ring::after{animation-delay:1.2s}
+@keyframes ripple{from{transform:scale(1);opacity:.8}to{transform:scale(1.9);opacity:0}}
+.ring svg{width:26px;height:26px;animation:shake 3s ease-in-out infinite}
+@keyframes shake{0%,80%,100%{transform:rotate(0)}84%{transform:rotate(-14deg)}88%{transform:rotate(14deg)}92%{transform:rotate(-10deg)}96%{transform:rotate(8deg)}}
+.phone-card small{display:block;color:var(--muted);font-size:.82rem;text-transform:uppercase;letter-spacing:1.5px}
+.phone-card strong{font-family:'Space Grotesk';font-size:1.6rem;letter-spacing:1px}
+
+.loc-card{border-radius:var(--radius);overflow:hidden;background:var(--card);border:1px solid var(--card-border);transition:all .45s var(--ease)}
+.loc-card:hover{transform:translateY(-6px);border-color:rgba(168,85,247,.45)}
+.loc-info{padding:26px 28px;display:flex;gap:18px;align-items:flex-start}
+.loc-pin{flex:none;width:50px;height:50px;border-radius:14px;display:grid;place-items:center;background:var(--grad)}
+.loc-pin svg{width:24px;height:24px;animation:pinDrop 2.6s var(--ease) infinite}
+@keyframes pinDrop{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+.loc-info .city{font-size:.8rem;text-transform:uppercase;letter-spacing:2px;color:var(--c1);font-weight:700}
+.loc-info h3{font-size:1.35rem;margin:2px 0 4px}
+.loc-info a.dir{color:var(--muted);font-size:.9rem;display:inline-flex;align-items:center;gap:6px;transition:color .3s}
+.loc-info a.dir:hover{color:var(--text)}
+.map{height:280px;position:relative;filter:grayscale(.3) invert(.92) hue-rotate(180deg) contrast(.9)}
+.map iframe{width:100%;height:100%;border:0}
+
+/* Footer */
+footer{padding:50px 0 40px;border-top:1px solid var(--card-border);margin-top:40px}
+.foot{display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap;color:var(--muted);font-size:.9rem}
+
+.to-top{
+  position:fixed;right:24px;bottom:24px;width:52px;height:52px;border-radius:50%;z-index:800;
+  display:grid;place-items:center;background:var(--grad);border:none;cursor:pointer;
+  box-shadow:0 10px 30px rgba(99,102,241,.45);opacity:0;transform:translateY(20px) scale(.8);transition:all .5s var(--ease);
+}
+.to-top.show{opacity:1;transform:none}
+.to-top svg{width:22px;height:22px}
+
+/* Reveal */
+.reveal{opacity:0;transform:translateY(50px);filter:blur(6px);transition:opacity 1s var(--ease),transform 1s var(--ease),filter 1s var(--ease)}
+.reveal.left{transform:translateX(-60px)}
+.reveal.right{transform:translateX(60px)}
+.reveal.zoom{transform:scale(.88)}
+.reveal.in{opacity:1;transform:none;filter:none}
+
+/* ---------- Responsive ---------- */
+section,.marquee{overflow-x:clip}
+@media (max-width:1200px){
+  .chip.c-c{right:-8px}
+  .chip.c-b{right:0}
+  .part.p-ram{right:20%}
+  .socials{grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+  .soc{flex-direction:column;text-align:center;padding:26px 16px}
+  .soc strong{font-size:1rem}
+  .soc .s-arrow{display:none}
+}
+@media (max-width:1000px){
+  .lap{width:88%;margin-inline:auto}
+  .laptop-scene{transform:rotateY(-8deg) rotateX(8deg)}
+  .hero-grid,.why-grid,.sale,.about-grid{grid-template-columns:minmax(0,1fr)}
+  .about-grid{gap:60px}
+  .hero-visual{width:100%;max-width:560px;margin:30px auto 0}
+  .part.p-ssd{left:-14px}
+  .process{grid-template-columns:1fr 1fr;row-gap:50px}
+  .process-line{display:none}
+  .contact-grid{grid-template-columns:1fr}
+  .sale{padding:50px 34px}
+  section{padding:90px 0}
+  .sec-head{margin-bottom:50px}
+  .orbit-wrap{max-width:min(380px,calc(100% - 64px))}
+}
+@media (max-width:820px){
+  .nav-links{
+    position:fixed;inset:0 0 0 auto;width:min(320px,85vw);flex-direction:column;gap:28px;
+    padding:110px 36px;background:rgba(7,10,20,.96);backdrop-filter:blur(20px);
+    border-left:1px solid var(--card-border);transform:translateX(100%);transition:transform .6s var(--ease);
+  }
+  .nav-links.open{transform:none}
+  .nav-links a{font-size:1.2rem}
+  .burger{display:block;z-index:950}
+  .nav .btn{display:none}
+}
+@media (max-width:600px){
+  section{padding:68px 0}
+  .sec-head{margin-bottom:40px}
+  .phones{grid-template-columns:1fr}
+  .socials{grid-template-columns:1fr}
+  .soc{flex-direction:row;text-align:left;padding:20px 22px}
+  .soc strong{font-size:1.08rem}
+  .soc .s-arrow{display:block}
+  .process{grid-template-columns:1fr 1fr;gap:36px 18px}
+  .step-num{width:60px;height:60px;font-size:1.25rem;margin-bottom:16px}
+  .step h4{font-size:1.02rem}
+  .step p{font-size:.86rem}
+  .card{padding:26px 22px}
+  .card-icon{width:52px;height:52px;margin-bottom:18px;border-radius:15px}
+  .card-icon svg{width:26px;height:26px}
+  .why-grid{gap:50px}
+  .chip.c-c{display:none}
+  .part{display:none}
+  .kbd{gap:3px}
+  .chip.c-a{left:-6px;top:-30px}
+  .chip.c-b{right:-6px}
+  .sale-icons .si{width:96px;height:130px}
+  .sale-icons .si:nth-child(2){width:120px}
+  .scroll-hint{display:none}
+  .hero{padding-top:110px}
+  .map{height:230px}
+  .spin-ring,.spin-ring-core{width:110px;height:110px;top:-34px;right:-14px}
+  .spin-ring-core i{width:44px;height:44px}
+}
+@media (max-width:400px){
+  .hero h1{font-size:2.15rem;letter-spacing:-1px}
+  .phone-card{padding:20px 18px;gap:16px}
+  .phone-card strong{font-size:1.35rem;white-space:nowrap}
+  .ring{width:50px;height:50px}
+  .ring svg{width:22px;height:22px}
+  .soc{gap:14px;padding:18px}
+  .s-ic{width:50px;height:50px;border-radius:15px}
+  .s-ic svg{width:24px;height:24px}
+  .soc .s-arrow{display:none}
+  .loc-info{padding:22px 20px;gap:14px}
+  .sale{padding:40px 22px}
+  .btn{padding:13px 22px}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}
+  .reveal{opacity:1;transform:none;filter:none}
+}
+</style>
+</head>
+<body>
+
+<!-- Gradient used by icons -->
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <linearGradient id="iconGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#22d3ee"/>
+      <stop offset="50%" stop-color="#6366f1"/>
+      <stop offset="100%" stop-color="#d946ef"/>
+    </linearGradient>
+    <linearGradient id="gaugeGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#22d3ee"/>
+      <stop offset="60%" stop-color="#6366f1"/>
+      <stop offset="100%" stop-color="#a855f7"/>
+    </linearGradient>
+  </defs>
+</svg>
+
+<div id="preloader"><div class="loader"><span></span><span></span><span></span></div></div>
+
+<div class="blobs"><div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div></div>
+<div class="grid-bg"></div>
+<canvas id="particles"></canvas>
+<div class="cursor-glow" id="cursorGlow"></div>
+<div class="progress" id="progress"></div>
+
+<!-- ============ HEADER ============ -->
+<header id="header">
+  <div class="container nav">
+    <a href="#acasa" class="logo">
+      <span class="logo-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M2 20h20"/><path d="m10 9 2 2 3-3"/></svg>
+      </span>
+      Reparații PC
+    </a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="#despre">Despre</a></li>
+      <li><a href="#servicii">Servicii</a></li>
+      <li><a href="#de-ce-noi">De ce noi</a></li>
+      <li><a href="#proces">Cum lucrăm</a></li>
+      <li><a href="#video">Video</a></li>
+      <li><a href="#vanzare">Vânzare</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+    <a href="tel:+37379434244" class="btn btn-primary">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/></svg>
+      Sună acum
+    </a>
+    <button class="burger" id="burger" aria-label="Meniu"><span></span><span></span><span></span></button>
+  </div>
+</header>
+
+<!-- ============ HERO ============ -->
+<section class="hero" id="acasa">
+  <div class="container hero-grid">
+    <div>
+      <div class="badge"><span class="dot"></span> Hîncești &nbsp;•&nbsp; Chișinău</div>
+      <h1>
+        <span class="split-word"><span style="animation-delay:.9s">Reparația</span></span>
+        <span class="split-word"><span class="grad-text" style="animation-delay:1.05s">laptopurilor</span></span><br>
+        <span class="split-word"><span style="animation-delay:1.2s">și</span></span>
+        <span class="split-word"><span class="grad-text" style="animation-delay:1.35s">calculatoarelor</span></span>
+      </h1>
+      <p class="typed-line reveal">Schimbăm <span class="typed" id="typed"></span><span class="caret"></span></p>
+      <div class="hero-actions reveal">
+        <a href="#contact" class="btn btn-primary">
+          Contactează-ne
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </a>
+        <a href="#servicii" class="btn btn-ghost">Vezi serviciile</a>
+      </div>
+      <div class="hero-locs reveal">
+        <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-7.5 8-13a8 8 0 0 0-16 0c0 5.5 8 13 8 13z"/><circle cx="12" cy="9" r="3"/></svg> Hîncești, str. 31 August</div>
+        <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-7.5 8-13a8 8 0 0 0-16 0c0 5.5 8 13 8 13z"/><circle cx="12" cy="9" r="3"/></svg> Chișinău, str. Iablocichin 5</div>
+      </div>
+    </div>
+
+    <div class="hero-visual reveal zoom">
+      <div class="glow-ring"></div>
+      <div class="laptop-scene" id="device" role="img" aria-label="Laptop animat care rulează un diagnostic">
+        <div class="lap">
+          <div class="lid">
+            <div class="lid-face lid-front" id="lidFront">
+              <div class="screen" id="scr">
+                <div class="scr-boot">
+                  <div class="boot-logo"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.8-3.8a6 6 0 0 1-7.9 7.9l-6.9 6.9a2.1 2.1 0 0 1-3-3l6.9-6.9a6 6 0 0 1 7.9-7.9z"/></svg></div>
+                  Reparații PC
+                  <div class="boot-bar"><i></i></div>
+                </div>
+                <div class="scr-ui">
+                  <div class="scr-top"><i></i><i></i><i></i>Diagnostic sistem<b>SCAN</b></div>
+                  <div class="scr-body">
+                    <div class="gauge">
+                      <svg viewBox="0 0 100 100"><circle class="trk" cx="50" cy="50" r="45"/><circle class="val" cx="50" cy="50" r="45"/></svg>
+                      <div class="gauge-txt"><span class="pct">0%</span><small>verificat</small></div>
+                    </div>
+                    <ul class="checks">
+                      <li data-n="Ecran">Ecran<span class="st"></span><span class="bar"><i></i></span></li>
+                      <li data-n="Tastatură">Tastatură<span class="st"></span><span class="bar"><i></i></span></li>
+                      <li data-n="Acumulator">Acumulator<span class="st"></span><span class="bar"><i></i></span></li>
+                      <li data-n="Conectoare">Conectoare<span class="st"></span><span class="bar"><i></i></span></li>
+                      <li data-n="Placa de bază">Placa de bază<span class="st"></span><span class="bar"><i></i></span></li>
+                    </ul>
+                  </div>
+                  <div class="scr-foot"><span class="led"></span><span id="scrMsg">Pornire diagnostic…</span></div>
+                </div>
+              </div>
+              <span class="cam"></span>
+            </div>
+            <div class="lid-face lid-back">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.8-3.8a6 6 0 0 1-7.9 7.9l-6.9 6.9a2.1 2.1 0 0 1-3-3l6.9-6.9a6 6 0 0 1 7.9-7.9z"/></svg>
+            </div>
+          </div>
+          <div class="base">
+            <div class="kbd" id="kbd"></div>
+            <div class="pad"></div>
+          </div>
+        </div>
+        <div class="lap-shadow"></div>
+      </div>
+
+      <div class="part p-ram" aria-hidden="true">
+        <svg viewBox="0 0 70 30" fill="none" stroke="url(#iconGrad)" stroke-width="1.8" stroke-linejoin="round"><path d="M2 4h66v18H38v4h-6v-4H2z"/><rect x="8" y="8" width="9" height="9" rx="1"/><rect x="21" y="8" width="9" height="9" rx="1"/><rect x="40" y="8" width="9" height="9" rx="1"/><rect x="53" y="8" width="9" height="9" rx="1"/></svg>
+      </div>
+      <div class="part p-fan" aria-hidden="true">
+        <svg viewBox="0 0 48 48" fill="none" stroke="url(#iconGrad)" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="42" height="42" rx="9"/><g class="blades"><circle cx="24" cy="24" r="4"/><path d="M24 20c0-8 4-11 9-10-1 5-4 9-9 10zM28 24c8 0 11 4 10 9-5-1-9-4-10-9zM24 28c0 8-4 11-9 10 1-5 4-9 9-10zM20 24c-8 0-11-4-10-9 5 1 9 4 10 9z"/></g></svg>
+      </div>
+      <div class="part p-ssd" aria-hidden="true">
+        <svg viewBox="0 0 48 48" fill="none" stroke="url(#iconGrad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="36" height="40" rx="4"/><circle cx="24" cy="21" r="8"/><circle cx="24" cy="21" r="1.5"/><path d="M14 37h20"/></svg>
+      </div>
+      <div class="chip c-a">
+        <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg></span>
+        <div>Ecrane noi<small>pentru laptopuri</small></div>
+      </div>
+      <div class="chip c-b">
+        <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><rect x="2" y="7" width="18" height="10" rx="2"/><path d="M22 11v2M6 10v4M10 10v4"/></svg></span>
+        <div>Acumulatoare<small>înlocuire rapidă</small></div>
+      </div>
+      <div class="chip c-c">
+        <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M12 2v4M12 18v4M4.9 4.9l2.8 2.8M16.3 16.3l2.8 2.8M2 12h4M18 12h4"/><circle cx="12" cy="12" r="3"/></svg></span>
+        <div>Windows<small>reinstalare</small></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ MARQUEE ============ -->
+<div class="marquee">
+  <div class="marquee-track">
+    <span>Ecrane</span><span>Tastaturi</span><span>Conectoare</span><span>Carcase</span><span>Acumulatoare</span><span>Plăci de bază</span><span>Sistem de operare</span><span>Telefoane</span><span>Calculatoare</span>
+    <span>Ecrane</span><span>Tastaturi</span><span>Conectoare</span><span>Carcase</span><span>Acumulatoare</span><span>Plăci de bază</span><span>Sistem de operare</span><span>Telefoane</span><span>Calculatoare</span>
+  </div>
+</div>
+
+<!-- ============ ABOUT ============ -->
+<section id="despre">
+  <div class="container about-grid">
+    <div class="portrait reveal left">
+      <div class="portrait-frame">
+        <div class="portrait-img">
+          <img src="images/vasile.jpg" alt="Galben Vasile">
+          <div class="portrait-name">
+            <strong>Galben Vasile</strong>
+            <span>Specialist reparații laptopuri și PC</span>
+          </div>
+        </div>
+      </div>
+      <svg class="spin-ring" viewBox="0 0 150 150" aria-hidden="true">
+        <defs><path id="circ" d="M75,75 m-58,0 a58,58 0 1,1 116,0 a58,58 0 1,1 -116,0"/></defs>
+        <text><textPath href="#circ">Reparații • Laptopuri • Calculatoare • </textPath></text>
+      </svg>
+      <div class="spin-ring-core"><i><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.8-3.8a6 6 0 0 1-7.9 7.9l-6.9 6.9a2.1 2.1 0 0 1-3-3l6.9-6.9a6 6 0 0 1 7.9-7.9z"/></svg></i></div>
+    </div>
+
+    <div class="about-text reveal right">
+      <span class="eyebrow grad-text">Despre mine</span>
+      <h2>Salut, sunt <span class="grad-text">Galben Vasile</span></h2>
+      <p>Mă ocup personal de reparația laptopurilor și calculatoarelor. Fiecare dispozitiv adus la mine trece printr-un diagnostic atent, ca să știi exact ce s-a defectat și ce trebuie făcut.</p>
+      <p>Schimb ecrane, tastaturi, conectoare, carcase, acumulatoare și plăci de bază, reinstalez sistemul de operare și am la vânzare telefoane și calculatoare.</p>
+      <div class="about-tags">
+        <span>Ecrane</span><span>Tastaturi</span><span>Conectoare</span><span>Acumulatoare</span><span>Plăci de bază</span><span>Windows</span>
+      </div>
+      <div class="about-sign">Galben Vasile</div>
+      <div class="about-social">
+        <a class="tt" href="https://www.tiktok.com/@vasile.g6" target="_blank" rel="noopener" aria-label="TikTok"><svg viewBox="0 0 24 24" fill="#fff"><path d="M16.6 5.8A4.3 4.3 0 0 1 15.5 3h-3.1v12.4a2.6 2.6 0 1 1-2.6-2.6c.3 0 .5 0 .8.1V9.7a5.7 5.7 0 1 0 4.9 5.7V9.1a7.3 7.3 0 0 0 4.3 1.4V7.4a4.3 4.3 0 0 1-3.2-1.6z"/></svg></a>
+        <a class="fb" href="https://www.facebook.com/vasile.galben.1" target="_blank" rel="noopener" aria-label="Facebook"><svg viewBox="0 0 24 24" fill="#fff"><path d="M14 8h3V4h-3c-2.2 0-4 1.8-4 4v3H7v4h3v8h4v-8h3l1-4h-4V8z"/></svg></a>
+        <a class="ig" href="https://www.instagram.com/vasile_galben93/" target="_blank" rel="noopener" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="#fff" stroke="none"/></svg></a>
+      </div>
+      <div class="hero-actions">
+        <a href="tel:+37379434244" class="btn btn-primary">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/></svg>
+          Sună-l pe Vasile
+        </a>
+        <a href="#contact" class="btn btn-ghost">Adrese</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SERVICES ============ -->
+<section id="servicii">
+  <div class="container">
+    <div class="sec-head reveal">
+      <span class="eyebrow grad-text">Serviciile noastre</span>
+      <h2>Tot ce are nevoie <span class="grad-text">laptopul tău</span></h2>
+      <p>De la un ecran spart până la o placă de bază defectă — readucem dispozitivul tău la viață.</p>
+    </div>
+
+    <div class="services-grid">
+      <div class="card reveal">
+        <span class="num">01</span>
+        <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M2 20h20"/><path d="m9 7 2 3-2 3M14 7l-1 6"/></svg></div>
+        <h3>Schimbare ecrane</h3>
+        <p>Înlocuim matricele sparte, cu dungi sau pete, pentru majoritatea modelelor de laptop.</p>
+      </div>
+      <div class="card reveal">
+        <span class="num">02</span>
+        <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M7 14h10"/></svg></div>
+        <h3>Tastaturi</h3>
+        <p>Taste care nu răspund, lichid vărsat sau taste lipsă — schimbăm tastatura complet.</p>
+      </div>
+      <div class="card reveal">
+        <span class="num">03</span>
+        <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22v-5M9 8V2M15 8V2"/><path d="M18 8v5a6 6 0 0 1-12 0V8z"/></svg></div>
+        <h3>Conectoare</h3>
+        <p>Mufe de încărcare, porturi USB, HDMI și altele — reparate sau înlocuite.</p>
+      </div>
+      <div class="card reveal">
+        <span class="num">04</span>
+        <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11H4z"/><path d="M2 19h20l-2-3H4z"/></svg></div>
+        <h3>Carcase</h3>
+        <p>Balamale rupte, carcase crăpate sau deteriorate — înlocuim piesele necesare.</p>
+      </div>
+      <div class="card reveal">
+        <span class="num">05</span>
+        <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="18" height="10" rx="2"/><path d="M22 11v2"/><path d="m11 9-2 3h4l-2 3"/></svg></div>
+        <h3>Acumulatoare</h3>
+        <p>Bateria nu mai ține? Montăm un acumulator nou pentru autonomie ca la început.</p>
+      </div>
+      <div class="card reveal">
+        <span class="num">06</span>
+        <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="5" width="14" height="14" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M9 2v3M15 2v3M9 19v3M15 19v3M2 9h3M2 15h3M19 9h3M19 15h3"/></svg></div>
+        <h3>Plăci de bază</h3>
+        <p>Diagnostic și înlocuirea plăcii de bază când laptopul nu mai pornește.</p>
+      </div>
+      <div class="card reveal">
+        <span class="num">07</span>
+        <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg></div>
+        <h3>Sistem de operare</h3>
+        <p>Reinstalarea sistemului de operare, drivere și programele de bază.</p>
+      </div>
+      <div class="card reveal">
+        <span class="num">08</span>
+        <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2" width="12" height="20" rx="2"/><path d="M11 18h2"/></svg></div>
+        <h3>Vânzare</h3>
+        <p>Telefoane și calculatoare disponibile la vânzare. Întreabă-ne ce avem în stoc.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ WHY US ============ -->
+<section id="de-ce-noi">
+  <div class="container why-grid">
+    <div class="reveal left">
+      <span class="eyebrow grad-text">De ce noi</span>
+      <h2 style="font-size:clamp(2rem,4vw,3rem);line-height:1.15;letter-spacing:-1px">Grijă pentru fiecare <span class="grad-text">dispozitiv</span></h2>
+      <div class="why-list">
+        <div class="why-item">
+          <span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg></span>
+          <div><h4>Diagnostic atent</h4><p>Aflăm exact ce s-a defectat înainte de a începe reparația.</p></div>
+        </div>
+        <div class="why-item">
+          <span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg></span>
+          <div><h4>Piese pentru multe modele</h4><p>Ecrane, tastaturi, acumulatoare, conectoare și carcase.</p></div>
+        </div>
+        <div class="why-item">
+          <span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg></span>
+          <div><h4>Două locații</h4><p>Ne găsești în Hîncești și în Chișinău.</p></div>
+        </div>
+        <div class="why-item">
+          <span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg></span>
+          <div><h4>Comunicare directă</h4><p>Ne suni și discuți direct cu cel care repară dispozitivul.</p></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="reveal right">
+      <div class="orbit-wrap">
+        <div class="orbit o1">
+          <div class="planet p-top"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M2 20h20"/></svg></div>
+          <div class="planet p-bottom"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><rect x="6" y="2" width="12" height="20" rx="2"/><path d="M11 18h2"/></svg></div>
+          <div class="planet p-left"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><rect x="2" y="7" width="18" height="10" rx="2"/><path d="M22 11v2"/></svg></div>
+          <div class="planet p-right"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M7 14h10"/></svg></div>
+        </div>
+        <div class="orbit o2">
+          <div class="planet p-top"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><rect x="5" y="5" width="14" height="14" rx="2"/><rect x="9" y="9" width="6" height="6"/></svg></div>
+          <div class="planet p-bottom"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M9 8V2M15 8V2"/><path d="M18 8v5a6 6 0 0 1-12 0V8z"/></svg></div>
+        </div>
+        <div class="orbit o3"></div>
+        <div class="orbit-core">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.8-3.8a6 6 0 0 1-7.9 7.9l-6.9 6.9a2.1 2.1 0 0 1-3-3l6.9-6.9a6 6 0 0 1 7.9-7.9z"/></svg>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PROCESS ============ -->
+<section id="proces">
+  <div class="container">
+    <div class="sec-head reveal">
+      <span class="eyebrow grad-text">Cum lucrăm</span>
+      <h2>Simplu, în <span class="grad-text">4 pași</span></h2>
+    </div>
+    <div class="process" id="process">
+      <div class="process-line"><i></i></div>
+      <div class="step reveal"><div class="step-num">1</div><h4>Ne suni</h4><p>Ne descrii problema la telefon.</p></div>
+      <div class="step reveal"><div class="step-num">2</div><h4>Aduci dispozitivul</h4><p>În Hîncești sau în Chișinău.</p></div>
+      <div class="step reveal"><div class="step-num">3</div><h4>Diagnostic și reparație</h4><p>Identificăm defectul și îl remediem.</p></div>
+      <div class="step reveal"><div class="step-num">4</div><h4>Ridici laptopul</h4><p>Gata de lucru, ca nou.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ VIDEOS ============ -->
+<section id="video">
+  <div class="container">
+    <div class="sec-head reveal">
+      <span class="eyebrow grad-text">Din atelier</span>
+      <h2>Reparații <span class="grad-text">în acțiune</span></h2>
+      <p>Câteva momente din procesul de reparație. Apasă pe un video ca să-l vezi mare, cu sunet.</p>
+    </div>
+    <div class="video-grid" id="videoGrid">
+      <div class="vcard reveal" data-src="videos/reparatie-1.mp4">
+        <div class="v-inner"><video src="videos/reparatie-1.mp4" poster="videos/reparatie-1.jpg" muted loop playsinline preload="metadata"></video></div>
+        <span class="v-num">01</span><span class="v-live"><i></i>Video</span>
+        <span class="v-play"><svg viewBox="0 0 24 24" fill="#fff"><path d="M7 4.5v15a1 1 0 0 0 1.5.9l12-7.5a1 1 0 0 0 0-1.8l-12-7.5A1 1 0 0 0 7 4.5z"/></svg></span>
+        <div class="v-cap"><h4>Ventilator și sistem de răcire</h4><span>Vezi cu sunet →</span></div>
+        <div class="v-bar"></div>
+      </div>
+      <div class="vcard reveal" data-src="videos/reparatie-2.mp4">
+        <div class="v-inner"><video src="videos/reparatie-2.mp4" poster="videos/reparatie-2.jpg" muted loop playsinline preload="metadata"></video></div>
+        <span class="v-num">02</span><span class="v-live"><i></i>Video</span>
+        <span class="v-play"><svg viewBox="0 0 24 24" fill="#fff"><path d="M7 4.5v15a1 1 0 0 0 1.5.9l12-7.5a1 1 0 0 0 0-1.8l-12-7.5A1 1 0 0 0 7 4.5z"/></svg></span>
+        <div class="v-cap"><h4>SSD și memorie RAM</h4><span>Vezi cu sunet →</span></div>
+        <div class="v-bar"></div>
+      </div>
+      <div class="vcard reveal" data-src="videos/reparatie-3.mp4">
+        <div class="v-inner"><video src="videos/reparatie-3.mp4" poster="videos/reparatie-3.jpg" muted loop playsinline preload="metadata"></video></div>
+        <span class="v-num">03</span><span class="v-live"><i></i>Video</span>
+        <span class="v-play"><svg viewBox="0 0 24 24" fill="#fff"><path d="M7 4.5v15a1 1 0 0 0 1.5.9l12-7.5a1 1 0 0 0 0-1.8l-12-7.5A1 1 0 0 0 7 4.5z"/></svg></span>
+        <div class="v-cap"><h4>Laptop de gaming desfăcut</h4><span>Vezi cu sunet →</span></div>
+        <div class="v-bar"></div>
+      </div>
+      <div class="vcard reveal" data-src="videos/reparatie-4.mp4">
+        <div class="v-inner"><video src="videos/reparatie-4.mp4" poster="videos/reparatie-4.jpg" muted loop playsinline preload="metadata"></video></div>
+        <span class="v-num">04</span><span class="v-live"><i></i>Video</span>
+        <span class="v-play"><svg viewBox="0 0 24 24" fill="#fff"><path d="M7 4.5v15a1 1 0 0 0 1.5.9l12-7.5a1 1 0 0 0 0-1.8l-12-7.5A1 1 0 0 0 7 4.5z"/></svg></span>
+        <div class="v-cap"><h4>Placă de bază și carcasă</h4><span>Vezi cu sunet →</span></div>
+        <div class="v-bar"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="lightbox" id="lightbox" aria-hidden="true">
+  <div class="lb-stage"><video id="lbVideo" controls playsinline></video></div>
+  <button class="lb-btn lb-close" id="lbClose" aria-label="Închide"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+  <button class="lb-btn lb-prev" id="lbPrev" aria-label="Înapoi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 6l-6 6 6 6"/></svg></button>
+  <button class="lb-btn lb-next" id="lbNext" aria-label="Înainte"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></button>
+  <div class="lb-count" id="lbCount"></div>
+</div>
+
+<!-- ============ SALE ============ -->
+<section id="vanzare">
+  <div class="container">
+    <div class="sale reveal zoom">
+      <div>
+        <span class="eyebrow" style="color:var(--c1)">La vânzare</span>
+        <h2>Telefoane și calculatoare <span class="grad-text">la vânzare</span></h2>
+        <p>Cauți un telefon sau un calculator? Sună-ne și află ce modele avem disponibile acum.</p>
+        <a href="tel:+37369709294" class="btn btn-primary">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/></svg>
+          Întreabă de stoc
+        </a>
+      </div>
+      <div class="sale-icons">
+        <div class="si"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round"><rect x="6" y="2" width="12" height="20" rx="2"/><path d="M11 18h2"/></svg></div>
+        <div class="si"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CONTACT ============ -->
+<section id="contact">
+  <div class="container">
+    <div class="sec-head reveal">
+      <span class="eyebrow grad-text">Date de contact</span>
+      <h2>Hai să-ți <span class="grad-text">reparăm</span> laptopul</h2>
+      <p>Sună-ne, scrie-ne pe rețelele sociale sau vino direct la una din locațiile noastre.</p>
+    </div>
+
+    <div class="phones">
+      <a href="tel:+37379434244" class="phone-card reveal left">
+        <span class="ring"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/></svg></span>
+        <div><small>Galben Vasile</small><strong>079 434 244</strong></div>
+      </a>
+      <a href="tel:+37369709294" class="phone-card reveal right">
+        <span class="ring"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/></svg></span>
+        <div><small>Galben Vasile</small><strong>069 709 294</strong></div>
+      </a>
+    </div>
+
+    <div class="socials">
+      <a class="soc tt reveal" href="https://www.tiktok.com/@vasile.g6" target="_blank" rel="noopener">
+        <span class="s-ic"><svg viewBox="0 0 24 24" fill="#fff"><path d="M16.6 5.8A4.3 4.3 0 0 1 15.5 3h-3.1v12.4a2.6 2.6 0 1 1-2.6-2.6c.3 0 .5 0 .8.1V9.7a5.7 5.7 0 1 0 4.9 5.7V9.1a7.3 7.3 0 0 0 4.3 1.4V7.4a4.3 4.3 0 0 1-3.2-1.6z"/></svg></span>
+        <div><small>TikTok</small><strong>@vasile.g6</strong></div>
+        <svg class="s-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M7 17 17 7M8 7h9v9"/></svg>
+      </a>
+      <a class="soc fb reveal" href="https://www.facebook.com/vasile.galben.1" target="_blank" rel="noopener">
+        <span class="s-ic"><svg viewBox="0 0 24 24" fill="#fff"><path d="M14 8h3V4h-3c-2.2 0-4 1.8-4 4v3H7v4h3v8h4v-8h3l1-4h-4V8z"/></svg></span>
+        <div><small>Facebook</small><strong>Vasile Galben</strong></div>
+        <svg class="s-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M7 17 17 7M8 7h9v9"/></svg>
+      </a>
+      <a class="soc ig reveal" href="https://www.instagram.com/vasile_galben93/" target="_blank" rel="noopener">
+        <span class="s-ic"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="#fff" stroke="none"/></svg></span>
+        <div><small>Instagram</small><strong>@vasile_galben93</strong></div>
+        <svg class="s-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M7 17 17 7M8 7h9v9"/></svg>
+      </a>
+    </div>
+
+    <div class="contact-grid">
+      <div class="loc-card reveal">
+        <div class="loc-info">
+          <span class="loc-pin"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M12 22s8-7.5 8-13a8 8 0 0 0-16 0c0 5.5 8 13 8 13z"/><circle cx="12" cy="9" r="3"/></svg></span>
+          <div>
+            <span class="city">Hîncești</span>
+            <h3>Strada 31 August</h3>
+            <a class="dir" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=Strada+31+August+H%C3%AEnce%C8%99ti">Deschide în Google Maps ↗</a>
+          </div>
+        </div>
+        <div class="map"><iframe loading="lazy" title="Hîncești, str. 31 August" src="https://maps.google.com/maps?q=Strada%2031%20August%2C%20H%C3%AEnce%C8%99ti%2C%20Moldova&z=15&output=embed"></iframe></div>
+      </div>
+      <div class="loc-card reveal">
+        <div class="loc-info">
+          <span class="loc-pin"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M12 22s8-7.5 8-13a8 8 0 0 0-16 0c0 5.5 8 13 8 13z"/><circle cx="12" cy="9" r="3"/></svg></span>
+          <div>
+            <span class="city">Chișinău</span>
+            <h3>Strada Iablocichin 5</h3>
+            <a class="dir" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=Iablocichin+5+Chi%C8%99in%C4%83u">Deschide în Google Maps ↗</a>
+          </div>
+        </div>
+        <div class="map"><iframe loading="lazy" title="Chișinău, str. Iablocichin 5" src="https://maps.google.com/maps?q=Iablocichin%205%2C%20Chi%C8%99in%C4%83u%2C%20Moldova&z=16&output=embed"></iframe></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<button class="to-top" id="toTop" aria-label="Sus">
+  <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+</button>
+
+<script>
+(() => {
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* Preloader */
+  addEventListener('load', () => setTimeout(() => document.getElementById('preloader').classList.add('hide'), 500));
+  setTimeout(() => document.getElementById('preloader').classList.add('hide'), 3500);
+
+
+  /* Header, progress bar, back-to-top */
+  const header = document.getElementById('header'), progress = document.getElementById('progress'), toTop = document.getElementById('toTop');
+  const onScroll = () => {
+    const y = scrollY, h = document.documentElement.scrollHeight - innerHeight;
+    header.classList.toggle('scrolled', y > 40);
+    progress.style.width = (h > 0 ? y / h * 100 : 0) + '%';
+    toTop.classList.toggle('show', y > 600);
+  };
+  addEventListener('scroll', onScroll, {passive:true}); onScroll();
+  toTop.onclick = () => scrollTo({top:0, behavior:'smooth'});
+
+  /* Mobile menu */
+  const burger = document.getElementById('burger'), links = document.getElementById('navLinks');
+  burger.onclick = () => { burger.classList.toggle('open'); links.classList.toggle('open'); };
+  links.querySelectorAll('a').forEach(a => a.onclick = () => { burger.classList.remove('open'); links.classList.remove('open'); });
+
+  /* Typing effect */
+  const words = ['ecrane.', 'tastaturi.', 'conectoare.', 'carcase.', 'acumulatoare.', 'plăci de bază.', 'și reinstalăm sistemul de operare.'];
+  const typed = document.getElementById('typed');
+  let w = 0, c = 0, del = false;
+  (function type(){
+    const word = words[w];
+    typed.textContent = word.slice(0, c);
+    if (!del && c < word.length) { c++; setTimeout(type, 70); }
+    else if (!del) { del = true; setTimeout(type, 1600); }
+    else if (c > 0) { c--; setTimeout(type, 35); }
+    else { del = false; w = (w + 1) % words.length; setTimeout(type, 300); }
+  })();
+
+  /* Scroll reveal with stagger */
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      const el = e.target;
+      const siblings = [...el.parentElement.children].filter(n => n.classList.contains('reveal'));
+      el.style.transitionDelay = (Math.max(0, siblings.indexOf(el)) * 0.1) + 's';
+      el.classList.add('in');
+      io.unobserve(el);
+    });
+  }, {threshold:.15, rootMargin:'0px 0px -40px 0px'});
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+  /* Process line */
+  const proc = document.getElementById('process');
+  new IntersectionObserver((en, ob) => { if (en[0].isIntersecting) { proc.classList.add('in'); ob.disconnect(); } }, {threshold:.4}).observe(proc);
+
+  const fine = matchMedia('(pointer: fine)').matches;
+
+  /* ===== Animated laptop: keyboard + diagnostic screen ===== */
+  const kbd = document.getElementById('kbd');
+  const rows = [[1,1,1,1,1,1,1,1,1,1,1,1,1,1],[1,1,1,1,1,1,1,1,1,1,1,1,1,1],[1,1,1,1,1,1,1,1,1,1,1,1,1,1],[1,1,1,1,1,1,1,1,1,1,1,1,1,1],[1,1,1,7,1,1,1,1]];
+  const keys = [];
+  rows.forEach((row, r) => {
+    let col = 0;
+    row.forEach(span => {
+      const k = document.createElement('span');
+      k.className = 'k' + (span > 1 ? ' sp' : '');
+      if (span > 1) k.style.gridColumn = 'span ' + span;
+      k.style.setProperty('--d', (col * 0.09 + r * 0.06).toFixed(2) + 's');
+      k.style.setProperty('--h', Math.round(190 + col * 9));
+      kbd.appendChild(k); keys.push(k);
+      col += span;
+    });
+  });
+  if (!reduce) {
+    setInterval(() => {
+      const k = keys[Math.floor(Math.random() * keys.length)];
+      k.classList.add('press'); setTimeout(() => k.classList.remove('press'), 160);
+    }, 260);
+  }
+
+  const scr = document.getElementById('scr'), lidFront = document.getElementById('lidFront');
+  const items = [...scr.querySelectorAll('.checks li')];
+  const gVal = scr.querySelector('.gauge .val'), pct = scr.querySelector('.pct'), msg = document.getElementById('scrMsg');
+  const CIRC = 283;
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
+  const setPct = p => {
+    gVal.style.strokeDashoffset = CIRC - CIRC * p / 100;
+    const from = +(pct.dataset.v || 0), t0 = performance.now();
+    pct.dataset.v = p;
+    (function step(t){
+      const k = Math.min(1, Math.max(0, (t - t0) / 550));
+      pct.textContent = Math.round(from + (p - from) * k) + '%';
+      if (k < 1) requestAnimationFrame(step);
+    })(t0);
+  };
+  (async function runDiag(){
+    if (reduce) {
+      scr.classList.add('on', 'ui', 'done'); lidFront.classList.add('live');
+      items.forEach(li => li.className = 'ok'); setPct(100);
+      msg.textContent = 'Gata! Laptopul funcționează perfect';
+      return;
+    }
+    await sleep(3300);                       // wait for the lid to open
+    scr.classList.add('on'); lidFront.classList.add('live');
+    await sleep(1600);
+    scr.classList.add('ui');
+    while (true) {
+      scr.classList.remove('done');
+      items.forEach(li => li.className = '');
+      setPct(0); msg.textContent = 'Pornire diagnostic…';
+      await sleep(1000);
+      for (let i = 0; i < items.length; i++) {
+        items[i].className = 'run';
+        msg.textContent = 'Verificare: ' + items[i].dataset.n + '…';
+        await sleep(950);
+        items[i].className = 'ok';
+        setPct(Math.round((i + 1) / items.length * 100));
+        await sleep(280);
+      }
+      scr.classList.add('done');
+      msg.textContent = 'Gata! Laptopul funcționează perfect';
+      await sleep(4200);
+    }
+  })();
+
+  /* Videos: autoplay muted when visible, progress bar, lightbox */
+  const vcards = [...document.querySelectorAll('.vcard')];
+  const vio = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      const v = e.target.querySelector('video');
+      if (e.isIntersecting && !reduce) { v.play().catch(() => {}); } else { v.pause(); }
+    });
+  }, {threshold:.35});
+  vcards.forEach(card => {
+    const v = card.querySelector('video'), bar = card.querySelector('.v-bar');
+    v.addEventListener('timeupdate', () => { if (v.duration) bar.style.width = (v.currentTime / v.duration * 100) + '%'; });
+    vio.observe(card);
+  });
+
+  const lb = document.getElementById('lightbox'), lbV = document.getElementById('lbVideo'), lbCount = document.getElementById('lbCount');
+  let cur = 0;
+  const show = i => {
+    cur = (i + vcards.length) % vcards.length;
+    lbV.src = vcards[cur].dataset.src;
+    lbV.muted = false;
+    lbV.play().catch(() => {});
+    lbCount.textContent = String(cur + 1).padStart(2, '0') + ' / ' + String(vcards.length).padStart(2, '0');
+  };
+  const openLb = i => {
+    vcards.forEach(c => c.querySelector('video').pause());
+    show(i); lb.classList.add('open'); lb.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+  };
+  const closeLb = () => {
+    lb.classList.remove('open'); lb.setAttribute('aria-hidden', 'true');
+    lbV.pause(); document.body.style.overflow = '';
+    vcards.forEach(c => { const r = c.getBoundingClientRect(); if (r.top < innerHeight && r.bottom > 0 && !reduce) c.querySelector('video').play().catch(() => {}); });
+  };
+  vcards.forEach((c, i) => c.addEventListener('click', () => openLb(i)));
+  document.getElementById('lbClose').onclick = closeLb;
+  document.getElementById('lbPrev').onclick = e => { e.stopPropagation(); show(cur - 1); };
+  document.getElementById('lbNext').onclick = e => { e.stopPropagation(); show(cur + 1); };
+  lb.addEventListener('click', e => { if (e.target === lb) closeLb(); });
+  addEventListener('keydown', e => {
+    if (!lb.classList.contains('open')) return;
+    if (e.key === 'Escape') closeLb();
+    if (e.key === 'ArrowLeft') show(cur - 1);
+    if (e.key === 'ArrowRight') show(cur + 1);
+  });
+
+  /* Card tilt + spotlight */
+  if (fine && !reduce) {
+    document.querySelectorAll('.card').forEach(card => {
+      card.addEventListener('mousemove', e => {
+        const r = card.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top;
+        card.style.setProperty('--mx', x + 'px'); card.style.setProperty('--my', y + 'px');
+        const rx = ((y / r.height) - .5) * -12, ry = ((x / r.width) - .5) * 12;
+        card.style.transform = `perspective(900px) rotateX(${rx}deg) rotateY(${ry}deg) translateY(-6px)`;
+      });
+      card.addEventListener('mouseleave', () => card.style.transform = '');
+    });
+
+    /* Hero device follows mouse */
+    const device = document.getElementById('device'), hero = document.querySelector('.hero');
+    hero.addEventListener('mousemove', e => {
+      const x = e.clientX / innerWidth - .5, y = e.clientY / innerHeight - .5;
+      device.style.transform = `rotateY(${-14 + x * 18}deg) rotateX(${8 - y * 10}deg)`;
+    });
+
+    /* Cursor glow */
+    const glow = document.getElementById('cursorGlow');
+    let gx = innerWidth/2, gy = innerHeight/2, tx = gx, ty = gy;
+    addEventListener('mousemove', e => { tx = e.clientX; ty = e.clientY; });
+    (function loop(){ gx += (tx-gx)*.12; gy += (ty-gy)*.12; glow.style.left = gx+'px'; glow.style.top = gy+'px'; requestAnimationFrame(loop); })();
+  } else {
+    document.getElementById('cursorGlow').style.display = 'none';
+  }
+
+  /* Particle network */
+  if (!reduce) {
+    const cv = document.getElementById('particles'), ctx = cv.getContext('2d');
+    let W, H, pts = [], mouse = {x:-999, y:-999};
+    const resize = () => {
+      W = cv.width = innerWidth; H = cv.height = innerHeight;
+      const n = Math.min(90, Math.floor(W * H / 16000));
+      pts = Array.from({length:n}, () => ({x:Math.random()*W, y:Math.random()*H, vx:(Math.random()-.5)*.35, vy:(Math.random()-.5)*.35, r:Math.random()*1.6+.6}));
+    };
+    resize(); addEventListener('resize', resize);
+    addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; });
+    (function draw(){
+      ctx.clearRect(0,0,W,H);
+      for (let i = 0; i < pts.length; i++) {
+        const p = pts[i];
+        p.x += p.vx; p.y += p.vy;
+        if (p.x < 0 || p.x > W) p.vx *= -1;
+        if (p.y < 0 || p.y > H) p.vy *= -1;
+        const dxm = p.x - mouse.x, dym = p.y - mouse.y, dm = Math.hypot(dxm, dym);
+        if (dm < 120) { p.x += dxm / dm * 1.2; p.y += dym / dm * 1.2; }
+        ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+        ctx.fillStyle = 'rgba(165,180,252,.7)'; ctx.fill();
+        for (let j = i + 1; j < pts.length; j++) {
+          const q = pts[j], d = Math.hypot(p.x - q.x, p.y - q.y);
+          if (d < 130) {
+            ctx.strokeStyle = `rgba(129,140,248,${(1 - d/130) * .22})`;
+            ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(q.x, q.y); ctx.stroke();
+          }
+        }
+      }
+      requestAnimationFrame(draw);
+    })();
+  }
+})();
+</script>
+</body>
+</html>
